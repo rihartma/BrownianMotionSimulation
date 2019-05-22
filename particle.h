@@ -20,7 +20,7 @@ private:
     int vy;
 public:
     Particle();
-    Particle(int radius, int mass, int x_pos, int y_pos, int vector_x, int vector_y);
+    Particle(int radius, int mass, int velocity, int x_pos, int y_pos, int vector_x, int vector_y);
     
     // working with the position
     int getX() const { return x; }
