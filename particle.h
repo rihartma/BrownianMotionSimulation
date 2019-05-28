@@ -12,17 +12,15 @@ private:
     double r;
     // mass of the particle
     double m;
-    // speed of the particle
-    double v;
     // position of the particle
     double x;
     double y;
-    // unit vector of the particle - representation of the movement direction
+    // a vector of the particle - representation of the movement direction and the velocity
     double vx;
     double vy;
 public:
     Particle();
-    Particle(double radius, double mass, double velocity, double x_pos, double y_pos, double vector_x, double vector_y);
+    Particle(double radius, double mass, double x_pos, double y_pos, double vector_x, double vector_y);
     
     // working with the position
     double getX() const { return x; }
@@ -36,9 +34,8 @@ public:
     void setVx(double new_vx) { vx = new_vx; }
     void setVy(double new_vy) { vy = new_vy; }
 
-    // working with the velocity
-    double getV() const { return v; }
-    void setV(double new_v) { v = new_v; }
+    // returns the velocity - size of the vector (vx, vy)
+    double getV() const { return sqrt(pow(vx, 2) + pow(vy, 2)); }
 
     double radius() const { return r; }  // returns the radius of the particle
     double mass() const { return m; }  // returns the mass of the particle

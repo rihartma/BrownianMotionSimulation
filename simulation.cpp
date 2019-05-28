@@ -1,12 +1,5 @@
 #include "simulation.h"
 
-// a function that generates random number in a interval <min, max)
-int randrange(int min, int max)
-{
-    int n = rand() % (max-min);
-    return n + min;
-}
-
 Particle* Simulation::init(int m, int n)  // an initialization of the simulation
 {
     // allocation of the memory for the particles
@@ -16,16 +9,18 @@ Particle* Simulation::init(int m, int n)  // an initialization of the simulation
 
     srand(time(NULL));  // initialization of the random generater
     // initialization of the Particles that forms the medium
+    double vx;
+    double vy;
     for(int i = 0; i < m; i++)
     {
+        particle_vector(vx, vy);
         p[i] = Particle(
             RADIUS_OF_MEDIUM,
             MASS_OF_MEDIUM,
-            randrange(MIN_SPEED, MAX_SPEED),
-            randrange(RADIUS_OF_MEDIUM, SURFACE_HEIGHT - RADIUS_OF_MEDIUM),
             randrange(RADIUS_OF_MEDIUM, SURFACE_WIDTH - RADIUS_OF_MEDIUM),
-            randrange(0, SURFACE_WIDTH),
-            randrange(0, SURFACE_HEIGHT)
+            randrange(RADIUS_OF_MEDIUM, SURFACE_HEIGHT - RADIUS_OF_MEDIUM),
+            vx,
+            vy
             );
     }
     // initialization of the Particles that floats in the medium
@@ -34,11 +29,10 @@ Particle* Simulation::init(int m, int n)  // an initialization of the simulation
         p[i] = Particle(
             RADIUS_OF_PARTICLES,
             MASS_OF_PARTICLES,
-            0,
-            randrange(RADIUS_OF_PARTICLES, SURFACE_HEIGHT - RADIUS_OF_PARTICLES),
             randrange(RADIUS_OF_PARTICLES, SURFACE_WIDTH - RADIUS_OF_PARTICLES),
+            randrange(RADIUS_OF_PARTICLES, SURFACE_HEIGHT - RADIUS_OF_PARTICLES),
             0,
-            1
+            0
             );
     }
 
@@ -58,6 +52,21 @@ void Simulation::step(Particle* particles, int n)  // the calculation of the new
         particles[i].setY(particles[i].getY()+particles[i].getVy());
     }
 }
+
+// a function that generates random number in a interval <min, max)
+int randrange(int min, int max)
+{
+    int n = rand() % (max-min);
+    return n + min;
+}
+// a function that generates random vector for velocity and direction representation of the particle
+void particle_vector(double& vx, double& vy, int min_velocity, int max_velocity)
+{
+    int velocity = randrange(min_velocity, max_velocity + 1);
+    vx = randrange(0, velocity + 1);
+    vy = sqrt(pow(velocity, 2) - pow(vx, 2));
+}
+
 
 // int main()
 // {

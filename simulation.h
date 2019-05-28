@@ -5,9 +5,6 @@
 #include <iostream>
 #include "particle.h"
 
-// a function that generates random number in a interval <min, max)
-int randrange(int min, int max);
-
 // a definition of the variables and a declaration of the functions that relates the simulation
 namespace Simulation
 {
@@ -26,5 +23,10 @@ namespace Simulation
     void close(Particle* particles);  // frees memory
     void step(Particle* particles, int n = NUMBER_OF_MEDIUM + NUMBER_OF_PARTICLES);  // the calculation of the new position and vectors of the particles
 }
+
+// a function that generates random number in a interval <min, max)
+int randrange(int min, int max);
+// a function that generates random vector for velocity and direction representation of the particle
+void particle_vector(double& vx, double& vy, int min_velocity = Simulation::MIN_SPEED, int max_velocity = Simulation::MAX_SPEED);
 
 #endif
