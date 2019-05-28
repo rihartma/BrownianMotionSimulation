@@ -1,23 +1,13 @@
-#include <cstdlib>  // a library for random nums
-#include <iostream>
-#include "particle.h"
+#include "simulation.h"
 
-const int RADIUS_OF_MEDIUM = 5;  // the radius of the particles that forms the medium(e.g. a H2O molecule)
-const int RADIUS_OF_PARTICLES = 50;  // the radius of the particles that floats in the medium(e.g. pollen grain)
-const int MASS_OF_MEDIUM = 1;  // the mass of the particle that forms the medium(e.g. a H2O molecule)
-const int MASS_OF_PARTICLES = 10;  // the mass of the particle that floats in the medium(e.g. pollen grain)
-const int MAX_SPEED = 5;  // a maximal possible speed of the particle after the start of the simulation
-const int MIN_SPEED = 1;  // a minimal possible speed of the particle after the start of the simulation
-const int SURFACE_WIDTH = 640;  // width of the surface for the simulation
-const int SURFACE_HEIGHT = 480;  // height of the surface for the simulation
-
-int randrange(int min, int max)  // a function that generates random number in a interval <min, max)
+// a function that generates random number in a interval <min, max)
+int randrange(int min, int max)
 {
     int n = rand() % (max-min);
     return n + min;
 }
 
-Particle* init(int m, int n = 1)  // an initialization of the simulation
+Particle* Simulation::init(int m, int n)  // an initialization of the simulation
 {
     // allocation of the memory for the particles
     // for m particles(molecules) of the medium
@@ -55,16 +45,21 @@ Particle* init(int m, int n = 1)  // an initialization of the simulation
     return p;
 }
 
-void close(Particle* particles)  // frees memory
+void Simulation::close(Particle* particles)  // frees memory
 {
     delete[] particles;
 }
 
-Particle* step(Particle* particles)  // the calculation of the new position and vectors of the particles
+void Simulation::step(Particle* particles, int n)  // the calculation of the new position and vectors of the particles
 {
+    for(int i = 0; i < n; i++)
+    {
+        particles[i].setX(particles[i].getX()+particles[i].getVx());
+        particles[i].setY(particles[i].getY()+particles[i].getVy());
+    }
 }
 
-int main()
-{
-    return 0;
-}
+// int main()
+// {
+//     return 0;
+// }

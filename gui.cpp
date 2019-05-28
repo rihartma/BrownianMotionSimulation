@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>  // a library for displaying the simulation
 #include <iostream>
 #include <cmath>  // a library for a pow func
+#include "particle.h"
+#include "simulation.h"
 
 // screen size
 const int SCREEN_WIDTH = 640;
@@ -15,11 +17,12 @@ void close_SDL();  // frees memory and shuts down sdl
 // a func that renders a circle
 void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius);
 
+// a func that runs the simulation
+void run();
+
 int main(int argc, char* args[])
 {
-    init_SDL();
-    SDL_Delay(4000);
-    close_SDL();
+    run();
     return 0;
 }
 
@@ -91,4 +94,30 @@ void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius)
         if (pow(x+1, 2) + pow(y-0.5, 2) >= pow(radius, 2))
             y--;
     }
+}
+
+
+void run()
+{
+    init_SDL();
+    Particle* particles = Simulation::init();
+    Simulation::close(particles);
+    close_SDL();
+//     init_SDL();
+
+//     Particle* particles = init();
+//     // while(true)
+//     // {
+//     //     SDL_SetRenderDrawColor(bm_renderer, 255, 255, 255, 255);
+//     //     SDL_RenderClear(bm_renderer);
+//     //     SDL_SetRenderDrawColor(bm_renderer, 0, 0, 255, 255);
+//     //     for(int i = 0; i < NUMBER_OF_MEDIUM + NUMBER_OF_PARTICLES; i++)
+//     //     {
+//     //     drawCircle(bm_renderer, , 100, 20);
+//     //     }
+//     //     SDL_RenderPresent(bm_renderer);
+//     //     SDL_Delay(4000);
+//     // }
+//     // close_SDL();
+//     close();
 }
