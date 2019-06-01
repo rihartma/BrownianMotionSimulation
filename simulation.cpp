@@ -44,12 +44,12 @@ void Simulation::close(Particle* particles)  // frees memory
     delete[] particles;
 }
 
-void Simulation::step(Particle* particles, int n)  // the calculation of the new position and vectors of the particles
+void Simulation::step(Particle* particles, int n, double t)  // the calculation of the new position and vectors of the particles in time t
 {
     for(int i = 0; i < n; i++)
     {
-        particles[i].setX(particles[i].getX()+particles[i].getVx());
-        particles[i].setY(particles[i].getY()+particles[i].getVy());
+        particles[i].setX(particles[i].getX()+particles[i].getVx()*t);
+        particles[i].setY(particles[i].getY()+particles[i].getVy()*t);
     }
 }
 
