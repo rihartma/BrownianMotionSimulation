@@ -1,4 +1,3 @@
-#include "particle.h"
 #include "collision.h"
 
 // calculates the time in which the particles collide with each other
@@ -26,7 +25,6 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
     double c = dx*dx + dy*dy - pow(p1.radius() + p2.radius(), 2);
     // a discriminant
     double D = b*b - 4*a*c;
-    std::cout << D << std::endl;
 
     if(D < 0)  // without a solution
         return -1;
@@ -65,4 +63,32 @@ void Collisions::handle_collision(Particle & p1, Particle & p2)
     p1.setVy(new_p1vx * ry + p1vy * rx);
     p2.setVx(new_p2vx * rx - p2vy * ry);
     p2.setVy(new_p2vx * ry + p2vy * rx);
+}
+
+// finds two particles of p with the nearest collision
+// returns their indexes and collision time
+Collisions::c_time Collisions::next_collision(Particle* p, int n)
+{
+    Collisions::c_time result;
+    result.p1 = 0;
+    result.p2 = 0;
+    result.t = DBL_MAX;
+    double t;
+    // goes through every possible option
+    for(int i = 0; i < n-1; i++)
+    {
+        for(int y = i+1; y < n; y++)
+        {
+            t = Collisions::collision_time(p[i], p[y]);
+            if(t < 0)
+                continue;
+            if(t < result.t)
+            {
+                result.p1 = i;
+                result.p2 = y;
+                result.t = t;
+            }
+        }
+    }
+    return result;
 }
