@@ -7,9 +7,6 @@
 
 const double PI =  3.14159265359;
 
-// calculates the angle between two given vectors
-double vectors_angle(double ux, double uy, double vx, double vy);
-
 // functions that detects the collision and that do collision responses
 namespace Collisions
 {

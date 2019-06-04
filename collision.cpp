@@ -1,17 +1,6 @@
 #include "particle.h"
 #include "collision.h"
 
-// calculates the angle between two given vectors
-double vectors_angle(double ux, double uy, double vx, double vy)
-{
-    double scalar_product = ux*vx + uy*vy;
-    double u_size = sqrt(pow(ux, 2) + pow(uy, 2));
-    double v_size = sqrt(pow(vx, 2) + pow(vy, 2));
-    double cos_alpha = scalar_product / (u_size * v_size);
-    return acos(cos_alpha);
-
-}
-
 // calculates the time in which the particles collide with each other
 double Collisions::collision_time(const Particle & p1, const Particle & p2)
 {
