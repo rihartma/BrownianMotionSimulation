@@ -35,7 +35,14 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
         double D_sqrt = sqrt(D);
         double t1 = (-b + D_sqrt) / (2 * a);
         double t2 = (-b - D_sqrt) / (2 * a);
-        return (t1 < t2 ? t1 : t2);
+        if(t1 >= 0 && t2 >= 0)
+            return (t1 < t2 ? t1 : t2);    
+        else if(t1 >= 0)
+            return t1;
+        else if(t2 >= 0)
+            return t2;
+        else
+            return -1;
     }
 }
 
