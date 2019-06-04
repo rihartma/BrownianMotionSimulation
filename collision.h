@@ -5,11 +5,19 @@
 #include <cmath>
 #include "particle.h"
 
+const double PI =  3.14159265359;
+
+// calculates the angle between two given vectors
+double vectors_angle(double ux, double uy, double vx, double vy);
+
 // functions that detects the collision and that do collision responses
 namespace Collisions
 {
     // calculates the time in which the particles collide with each other
     double collision_time(const Particle & p1, const Particle & p2);
+    // recalculates the vectors of the particles after a collision appears
+    void handle_collision(Particle & p1, Particle & p2);
+
 }
 
 #endif

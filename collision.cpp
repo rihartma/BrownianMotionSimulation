@@ -1,6 +1,17 @@
 #include "particle.h"
 #include "collision.h"
 
+// calculates the angle between two given vectors
+double vectors_angle(double ux, double uy, double vx, double vy)
+{
+    double scalar_product = ux*vx + uy*vy;
+    double u_size = sqrt(pow(ux, 2) + pow(uy, 2));
+    double v_size = sqrt(pow(vx, 2) + pow(vy, 2));
+    double cos_alpha = scalar_product / (u_size * v_size);
+    return acos(cos_alpha);
+
+}
+
 // calculates the time in which the particles collide with each other
 double Collisions::collision_time(const Particle & p1, const Particle & p2)
 {
@@ -39,4 +50,30 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
         double t2 = (-b - D_sqrt) / (2 * a);
         return (t1 < t2 ? t1 : t2);
     }
+}
+
+// recalculates the vectors of the particles after a collision appears
+void Collisions::handle_collision(Particle & p1, Particle & p2)
+{
+    double p1_m = p1.mass(); // a mass of the p1 particle
+    double p2_m = p2.mass(); // a mass of the p2 particle
+    // a unit vector with direction same as the line connecting the centers of the particles
+    double r_size = sqrt(pow(p2.getX()-p1.getX(), 2) + pow(p2.getY()-p1.getY(), 2));
+    double rx = (p2.getX()-p1.getX()) / r_size;
+    double ry = (p2.getY()-p1.getY()) / r_size;
+    // recalculating the coordinates into a rotated coordinate system
+    // a vector (rx, ry) represents x-axis
+    double p1vx = p1.getVx() * rx + p1.getVy() * ry;
+    double p1vy = - p1.getVx() * ry + p1.getVx() * rx;
+    double p2vx = p2.getVx() * rx + p2.getVy() * ry;
+    double p2vy = - p2.getVx() * ry + p2.getVx() * rx;
+    // recalculation of x-components of the vectors
+    // conservates the momentum and kinetic energy
+    double new_p1vx = p1vx * (p1_m - p2_m) / (p1_m + p2_m) + p2vx * 2 * p2_m / (p1_m + p2_m);
+    double new_p2vx = p1vx * 2 * p1_m / (p1_m + p2_m) + p2vx * (p2_m - p1_m) / (p1_m + p2_m);
+    // sets the new vectors(rotated back to normal coordinate system)
+    p1.setVx(new_p1vx * rx - p1vy * ry);
+    p1.setVy(new_p1vx * ry + p1vy * rx);
+    p2.setVx(new_p2vx * rx - p2vy * ry);
+    p2.setVy(new_p2vx * ry + p2vy * rx);
 }
