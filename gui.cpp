@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>  // a library for displaying the simulation
 #include <iostream>
 #include <cmath>
+#include <chrono>
 #include "particle.h"
 #include "simulation.h"
 #include "collision.h"
@@ -8,6 +9,9 @@
 // screen size
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+
+// delay between rendering new frames
+const int DELAY = 50;
 
 SDL_Window* bm_window = NULL;  // the window for rendering
 SDL_Renderer* bm_renderer = NULL;  // the window renderer
@@ -114,6 +118,10 @@ void run()
 {
     init_SDL();
     Particle* particles = Simulation::init();
+
+    std::chrono::high_resolution_clock::time_point measure_t_1;
+    std::chrono::high_resolution_clock::time_point measure_t_2;
+    int duration;
     
     Collisions::c_time next_col;
     
@@ -126,12 +134,16 @@ void run()
         // drawing the simulation between the collisions
         while(next_col.t - part_step >= 0)
         {
+            measure_t_1 = std::chrono::high_resolution_clock::now();
             next_col.t = next_col.t - part_step;
             Simulation::step(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, part_step);
             draw_scene(bm_renderer, particles);
-            SDL_Delay(50);
+            measure_t_2 = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::microseconds>(measure_t_2 - measure_t_1).count();
+            SDL_Delay(DELAY-duration/1000);
             part_step = step;
         }
+        measure_t_1 = std::chrono::high_resolution_clock::now();
         do
         {
             Simulation::step(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, next_col.t);
@@ -144,6 +156,10 @@ void run()
             next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
         }
         while(part_step - next_col.t >= 0);
+        measure_t_2 = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(measure_t_2 - measure_t_1).count();
+        SDL_Delay(DELAY-duration/1000);
+
     }
 
 
