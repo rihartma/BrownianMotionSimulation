@@ -21,8 +21,10 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
     }
     // b = 2*d*v
     double b = 2 * (dx*vx + dy*vy);
+    // std::cout << b << std::endl;
     // c = d*d - (radius1 + radius2)^2
     double c = dx*dx + dy*dy - pow(p1.radius() + p2.radius(), 2);
+    // std::cout << c << std::endl;
     // a discriminant
     double D = b*b - 4*a*c;
 
@@ -32,9 +34,12 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
         return (-b) / (2 * a);
     else  // two solutions - returns the smaller number
     {
+        // std::cout << "2: " << std::endl;
         double D_sqrt = sqrt(D);
         double t1 = (-b + D_sqrt) / (2 * a);
         double t2 = (-b - D_sqrt) / (2 * a);
+        // std::cout << t1 << std::endl;
+        // std::cout << t2 << std::endl << std::endl;
         if(t1 >= 0 && t2 >= 0)
             return (t1 < t2 ? t1 : t2);    
         else if(t1 >= 0)
@@ -44,6 +49,52 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
         else
             return -1;
     }
+}
+
+// calculates the time in which tha particle collide with a wall
+Collisions::c_time Collisions::wall_collision_time(const Particle & p1, int area_width, int area_height)
+{
+    double vx = p1.getVx();
+    double tx = -1;
+    if(vx != 0)  // going to collide with left or right wall
+    {
+        if(vx > 0)  // going to collide with right wall
+            tx = (area_width - p1.radius() - p1.getX()) / vx;
+        else  // goinf to collide with left wall
+            tx = (p1.radius() - p1.getX()) / vx;
+    }
+    double vy = p1.getVy();
+    double ty = -1;
+    if(vy != 0)  // going to collide with the top or the bottom wall
+    {
+        if(vy > 0)  // going to collide with the bottom wall
+            ty = (area_height - p1.radius() - p1.getY()) / vy;
+        else  // goinf to collide with the top wall
+            ty = (p1.radius() - p1.getY()) / vy;
+    }
+
+    Collisions::c_time result;
+    result.p1 = 0;
+    result.p2 = 0;
+    if(tx == ty)  // collides with two walls at the same time
+    {
+        result.t = tx;
+        result.v_wall = true;
+        result.h_wall = true;
+    }
+    else if(tx < ty)  // collides with the left or the right wall
+    {
+        result.t = tx;
+        result.v_wall = true;
+        result.h_wall = false;
+    }
+    else // collides with the top or the bottom wall
+    {
+        result.t = ty;
+        result.v_wall = false;
+        result.h_wall = true;
+    }
+    return result;
 }
 
 // recalculates the vectors of the particles after a collision appears
@@ -72,16 +123,50 @@ void Collisions::handle_collision(Particle & p1, Particle & p2)
     p2.setVy(new_p2vx * ry + p2vy * rx);
 }
 
+// recalculates the vectors of the particles after a collision with wall appear
+void Collisions::handle_wall_collision(Particle & p, bool h_wall, bool v_wall)
+{
+    if(h_wall)
+    {
+        p.setVy(-p.getVy());
+    }
+    if(v_wall)
+    {
+        p.setVx(-p.getVx());
+    }
+}
+
 // finds two particles of p with the nearest collision
 // returns their indexes and collision time
-Collisions::c_time Collisions::next_collision(Particle* p, int n)
+Collisions::c_time Collisions::next_collision(Particle* p, int n, int area_width, int area_height)
 {
     Collisions::c_time result;
     result.p1 = 0;
     result.p2 = 0;
     result.t = DBL_MAX;
+    result.h_wall = false;
+    result.v_wall = false;
+
+    // finds the first collision with the wall
+    Collisions::c_time next_collision;
+    next_collision.p1 = 0;
+    next_collision.p2 = 0;
+    next_collision.t = DBL_MAX;
+    next_collision.h_wall = false;
+    next_collision.v_wall = false;
+    for(int i = 0; i < n; i++)
+    {
+        next_collision = Collisions::wall_collision_time(p[i], area_width, area_height);
+        if(next_collision.t >= 0 && next_collision.t < result.t)
+        {
+            result.t = next_collision.t;
+            result.h_wall = next_collision.h_wall;
+            result.v_wall = next_collision.v_wall;
+            result.p1 = i;
+        }
+    }
+    // finds the first particle-particle collision
     double t;
-    // goes through every possible option
     for(int i = 0; i < n-1; i++)
     {
         for(int y = i+1; y < n; y++)
@@ -91,6 +176,8 @@ Collisions::c_time Collisions::next_collision(Particle* p, int n)
                 continue;
             if(t < result.t)
             {
+                result.h_wall = false;
+                result.v_wall = false;
                 result.p1 = i;
                 result.p2 = y;
                 result.t = t;
