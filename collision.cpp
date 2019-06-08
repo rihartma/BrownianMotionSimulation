@@ -14,10 +14,11 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
     double a = vx*vx + vy*vy;
     if(a == 0)  // p1 and p2 has got the same vector, cannot calculate with a quadratic equation
     {
-        if((dx*dx + dy*dy) == pow(p1.radius(), 2) + pow(p2.radius(), 2))  // they are colliding
-            return 0;
-        else
-            return -1;  // never collides( or they are overlaping each other )
+        // if((dx*dx + dy*dy) == pow(p1.radius(), 2) + pow(p2.radius(), 2))  // they are colliding
+        //     return 0;
+        // else
+        //     return -1;  // never collides( or they are overlaping each other )
+        return -1;
     }
     // b = 2*d*v
     double b = 2 * (dx*vx + dy*vy);
@@ -31,23 +32,16 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
     if(D < 0)  // without a solution
         return -1;
     else if(D == 0)  // one solution
-        return (-b) / (2 * a);
+        return -1;
     else  // two solutions - returns the smaller number
     {
-        // std::cout << "2: " << std::endl;
         double D_sqrt = sqrt(D);
         double t1 = (-b + D_sqrt) / (2 * a);
         double t2 = (-b - D_sqrt) / (2 * a);
-        // std::cout << t1 << std::endl;
-        // std::cout << t2 << std::endl << std::endl;
-        if(t1 >= 0 && t2 >= 0)
-            return (t1 < t2 ? t1 : t2);    
-        else if(t1 >= 0)
-            return t1;
-        else if(t2 >= 0)
-            return t2;
-        else
+        if(t1 < 0 || t2 < 0)
             return -1;
+        else
+            return (t1 < t2 ? t1 : t2);
     }
 }
 
@@ -59,7 +53,10 @@ Collisions::c_time Collisions::wall_collision_time(const Particle & p1, int area
     if(vx != 0)  // going to collide with left or right wall
     {
         if(vx > 0)  // going to collide with right wall
+        {
             tx = (area_width - p1.radius() - p1.getX()) / vx;
+            // std::cout << tx << std::endl;
+        }
         else  // goinf to collide with left wall
             tx = (p1.radius() - p1.getX()) / vx;
     }
@@ -76,24 +73,31 @@ Collisions::c_time Collisions::wall_collision_time(const Particle & p1, int area
     Collisions::c_time result;
     result.p1 = 0;
     result.p2 = 0;
-    if(tx == ty)  // collides with two walls at the same time
+    if(tx == ty && tx != -1)  // collides with two walls at the same time
     {
         result.t = tx;
         result.v_wall = true;
         result.h_wall = true;
     }
-    else if(tx < ty)  // collides with the left or the right wall
+    else if((tx < ty && tx != -1) || (tx != -1 && ty == -1))  // collides with the left or the right wall
     {
         result.t = tx;
         result.v_wall = true;
         result.h_wall = false;
     }
-    else // collides with the top or the bottom wall
+    else if((ty < tx && ty != -1) || (ty != -1 && tx == -1)) // collides with the top or the bottom wall
     {
         result.t = ty;
         result.v_wall = false;
         result.h_wall = true;
     }
+    else
+    {
+        result.t = ty;
+        result.v_wall = false;
+        result.h_wall = false;
+    }
+
     return result;
 }
 
@@ -186,3 +190,12 @@ Collisions::c_time Collisions::next_collision(Particle* p, int n, int area_width
     }
     return result;
 }
+
+// int main()
+// {
+//     using namespace std;
+//     Particle p1(10, 1, 10, 10, 0, 1);
+//     Particle p2(10, 1, 10, 30, 2, 1);
+//     std::cout << Collisions::collision_time(p1, p2) << std::endl;
+//     return 0;
+// }

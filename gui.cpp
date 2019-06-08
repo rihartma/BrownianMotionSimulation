@@ -1,8 +1,9 @@
 #include <SDL2/SDL.h>  // a library for displaying the simulation
 #include <iostream>
-#include <cmath>  // a library for a pow func
+#include <cmath>
 #include "particle.h"
 #include "simulation.h"
+#include "collision.h"
 
 // screen size
 const int SCREEN_WIDTH = 640;
@@ -14,8 +15,8 @@ SDL_Renderer* bm_renderer = NULL;  // the window renderer
 bool init_SDL();  // starts up sdl
 void close_SDL();  // frees memory and shuts down sdl
 
-// a func that renders a circle
-void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius);
+void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius);  // a func that renders a circle
+void draw_scene(SDL_Renderer* r, Particle* p, int n = Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES);  // renders every particle
 
 // a func that runs the simulation
 void run();
@@ -96,28 +97,56 @@ void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius)
     }
 }
 
+void draw_scene(SDL_Renderer* r, Particle* p, int n)
+{
+    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+    SDL_RenderClear(r);
+    SDL_SetRenderDrawColor(r, 0, 0, 255, 255);
+    for(int i = 0; i < n; i++)
+    {
+        drawCircle(r, p[i].getX(), p[i].getY(), p[i].radius());
+    }
+    SDL_RenderPresent(r);
+}
+
 
 void run()
 {
     init_SDL();
     Particle* particles = Simulation::init();
+    
+    Collisions::c_time next_col;
+    
+    double step = 1;
+    double part_step = step;
+
+    next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
+    while(true)
+    {
+        // drawing the simulation between the collisions
+        while(next_col.t - part_step >= 0)
+        {
+            next_col.t = next_col.t - part_step;
+            Simulation::step(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, part_step);
+            draw_scene(bm_renderer, particles);
+            SDL_Delay(50);
+            part_step = step;
+        }
+        do
+        {
+            Simulation::step(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, next_col.t);
+            part_step -= next_col.t;
+            // does the collision response
+            if(next_col.h_wall || next_col.v_wall)
+                Collisions::handle_wall_collision(particles[next_col.p1], next_col.h_wall, next_col.v_wall);
+            else
+                Collisions::handle_collision(particles[next_col.p1], particles[next_col.p2]);
+            next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
+        }
+        while(part_step - next_col.t >= 0);
+    }
+
+
     Simulation::close(particles);
     close_SDL();
-//     init_SDL();
-
-//     Particle* particles = init();
-//     // while(true)
-//     // {
-//     //     SDL_SetRenderDrawColor(bm_renderer, 255, 255, 255, 255);
-//     //     SDL_RenderClear(bm_renderer);
-//     //     SDL_SetRenderDrawColor(bm_renderer, 0, 0, 255, 255);
-//     //     for(int i = 0; i < NUMBER_OF_MEDIUM + NUMBER_OF_PARTICLES; i++)
-//     //     {
-//     //     drawCircle(bm_renderer, , 100, 20);
-//     //     }
-//     //     SDL_RenderPresent(bm_renderer);
-//     //     SDL_Delay(4000);
-//     // }
-//     // close_SDL();
-//     close();
 }
