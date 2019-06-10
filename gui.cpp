@@ -1,12 +1,17 @@
 #include <SDL2/SDL.h>  // a library for displaying the simulation
 #include <iostream>
-#include <cmath>  // a library for a pow func
+#include <cmath>
+#include <chrono>
 #include "particle.h"
 #include "simulation.h"
+#include "collision.h"
 
 // screen size
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+
+// delay between rendering new frames
+const int DELAY = 50;
 
 SDL_Window* bm_window = NULL;  // the window for rendering
 SDL_Renderer* bm_renderer = NULL;  // the window renderer
@@ -14,8 +19,8 @@ SDL_Renderer* bm_renderer = NULL;  // the window renderer
 bool init_SDL();  // starts up sdl
 void close_SDL();  // frees memory and shuts down sdl
 
-// a func that renders a circle
-void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius);
+void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius);  // a func that renders a circle
+void draw_scene(SDL_Renderer* r, Particle* p, int n = Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES);  // renders every particle
 
 // a func that runs the simulation
 void run();
@@ -96,28 +101,85 @@ void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius)
     }
 }
 
+// draws the actual scene
+void draw_scene(SDL_Renderer* r, Particle* p, int n)
+{
+    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+    SDL_RenderClear(r);
+    SDL_SetRenderDrawColor(r, 0, 0, 255, 255);
+    for(int i = 0; i < n; i++)
+    {
+        drawCircle(r, p[i].getX(), p[i].getY(), p[i].radius());
+    }
+    SDL_RenderPresent(r);
+}
 
+// runs the simulation
 void run()
 {
     init_SDL();
+
+    // An event initialization for the quit button
+    SDL_Event event;
+    bool quit = false;
+
     Particle* particles = Simulation::init();
+
+    // Initialization of the varibles for mesuring of the execution time
+    // Synchronizes the steps with a longer execution time(More collisions in a small interval)
+    std::chrono::high_resolution_clock::time_point measure_t_1;
+    std::chrono::high_resolution_clock::time_point measure_t_2;
+    int duration;
+    
+    // Size of the step of a one time unit
+    double step = 1;
+    double part_step = step;
+
+    // Stores the information of the nearest collision
+    Collisions::c_time next_col;
+    next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
+
+    // a main loop
+    while(!quit)
+    {
+        // drawing of the simulation between the collisions
+        while(next_col.t - part_step >= 0)
+        {
+            measure_t_1 = std::chrono::high_resolution_clock::now();
+            next_col.t = next_col.t - part_step;
+            Simulation::step(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, part_step);
+            draw_scene(bm_renderer, particles);
+            measure_t_2 = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::microseconds>(measure_t_2 - measure_t_1).count();
+            SDL_Delay(DELAY-duration/1000);
+            part_step = step;
+        }
+        // calculates the next collision and does the collision responses
+        measure_t_1 = std::chrono::high_resolution_clock::now();
+        do
+        {
+            Simulation::step(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, next_col.t);
+            part_step -= next_col.t;
+            // does the collision response
+            if(next_col.h_wall || next_col.v_wall)
+                Collisions::handle_wall_collision(particles[next_col.p1], next_col.h_wall, next_col.v_wall);
+            else
+                Collisions::handle_collision(particles[next_col.p1], particles[next_col.p2]);
+            next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
+        }
+        while(part_step - next_col.t >= 0);
+        measure_t_2 = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(measure_t_2 - measure_t_1).count();
+        SDL_Delay(DELAY-duration/1000);
+
+        // Checking if a quitbutton was or wasn't pressed
+        while(SDL_PollEvent(&event) != 0)
+        {
+            if(event.type == SDL_QUIT)
+                quit = true;
+        }
+    }
+    // shuts down the simulation
     Simulation::close(particles);
     close_SDL();
-//     init_SDL();
-
-//     Particle* particles = init();
-//     // while(true)
-//     // {
-//     //     SDL_SetRenderDrawColor(bm_renderer, 255, 255, 255, 255);
-//     //     SDL_RenderClear(bm_renderer);
-//     //     SDL_SetRenderDrawColor(bm_renderer, 0, 0, 255, 255);
-//     //     for(int i = 0; i < NUMBER_OF_MEDIUM + NUMBER_OF_PARTICLES; i++)
-//     //     {
-//     //     drawCircle(bm_renderer, , 100, 20);
-//     //     }
-//     //     SDL_RenderPresent(bm_renderer);
-//     //     SDL_Delay(4000);
-//     // }
-//     // close_SDL();
-//     close();
 }
