@@ -117,19 +117,23 @@ void draw_scene(SDL_Renderer* r, Particle* p, int n)
 void run()
 {
     init_SDL();
+
+    SDL_Event event;
+    bool quit = false;
+
     Particle* particles = Simulation::init();
 
     std::chrono::high_resolution_clock::time_point measure_t_1;
     std::chrono::high_resolution_clock::time_point measure_t_2;
     int duration;
-    
+
     Collisions::c_time next_col;
     
     double step = 1;
     double part_step = step;
 
     next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
-    while(true)
+    while(!quit)
     {
         // drawing the simulation between the collisions
         while(next_col.t - part_step >= 0)
@@ -160,6 +164,11 @@ void run()
         duration = std::chrono::duration_cast<std::chrono::microseconds>(measure_t_2 - measure_t_1).count();
         SDL_Delay(DELAY-duration/1000);
 
+        while(SDL_PollEvent(&event) != 0)
+        {
+            if(event.type == SDL_QUIT)
+                quit = true;
+        }
     }
 
 
