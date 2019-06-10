@@ -101,6 +101,7 @@ void drawCircle(SDL_Renderer* r, int centreX, int centreY, int radius)
     }
 }
 
+// draws the actual scene
 void draw_scene(SDL_Renderer* r, Particle* p, int n)
 {
     SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
@@ -113,29 +114,35 @@ void draw_scene(SDL_Renderer* r, Particle* p, int n)
     SDL_RenderPresent(r);
 }
 
-
+// runs the simulation
 void run()
 {
     init_SDL();
 
+    // An event initialization for the quit button
     SDL_Event event;
     bool quit = false;
 
     Particle* particles = Simulation::init();
 
+    // Initialization of the varibles for mesuring of the execution time
+    // Synchronizes the steps with a longer execution time(More collisions in a small interval)
     std::chrono::high_resolution_clock::time_point measure_t_1;
     std::chrono::high_resolution_clock::time_point measure_t_2;
     int duration;
-
-    Collisions::c_time next_col;
     
+    // Size of the step of a one time unit
     double step = 1;
     double part_step = step;
 
+    // Stores the information of the nearest collision
+    Collisions::next_col;
     next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
+
+    // a main loop
     while(!quit)
     {
-        // drawing the simulation between the collisions
+        // drawing of the simulation between the collisions
         while(next_col.t - part_step >= 0)
         {
             measure_t_1 = std::chrono::high_resolution_clock::now();
@@ -147,6 +154,7 @@ void run()
             SDL_Delay(DELAY-duration/1000);
             part_step = step;
         }
+        // calculates the next collision and does the collision responses
         measure_t_1 = std::chrono::high_resolution_clock::now();
         do
         {
@@ -164,14 +172,14 @@ void run()
         duration = std::chrono::duration_cast<std::chrono::microseconds>(measure_t_2 - measure_t_1).count();
         SDL_Delay(DELAY-duration/1000);
 
+        // Checking if a quitbutton was or wasn't pressed
         while(SDL_PollEvent(&event) != 0)
         {
             if(event.type == SDL_QUIT)
                 quit = true;
         }
     }
-
-
+    // shuts down the simulation
     Simulation::close(particles);
     close_SDL();
 }

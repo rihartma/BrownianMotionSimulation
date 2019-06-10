@@ -49,49 +49,46 @@ double Collisions::collision_time(const Particle & p1, const Particle & p2)
 Collisions::c_time Collisions::wall_collision_time(const Particle & p1, int area_width, int area_height)
 {
     double vx = p1.getVx();
-    double tx = -1;
+    double tx = -1;  // time of the collision with the left or the right wall
     if(vx != 0)  // going to collide with left or right wall
     {
         if(vx > 0)  // going to collide with right wall
-        {
             tx = (area_width - p1.radius() - p1.getX()) / vx;
-            // std::cout << tx << std::endl;
-        }
-        else  // goinf to collide with left wall
+        else  // going to collide with left wall
             tx = (p1.radius() - p1.getX()) / vx;
     }
     double vy = p1.getVy();
-    double ty = -1;
+    double ty = -1;  // time of the collision with the top or the bottom wall
     if(vy != 0)  // going to collide with the top or the bottom wall
     {
         if(vy > 0)  // going to collide with the bottom wall
             ty = (area_height - p1.radius() - p1.getY()) / vy;
-        else  // goinf to collide with the top wall
+        else  // going to collide with the top wall
             ty = (p1.radius() - p1.getY()) / vy;
     }
 
     Collisions::c_time result;
     result.p1 = 0;
     result.p2 = 0;
-    if(tx == ty && tx != -1)  // collides with two walls at the same time
+    if(tx == ty && tx != -1)  // collision with two walls at the same time(with edge)
     {
         result.t = tx;
         result.v_wall = true;
         result.h_wall = true;
     }
-    else if((tx < ty && tx != -1) || (tx != -1 && ty == -1))  // collides with the left or the right wall
+    else if((tx < ty && tx != -1) || (tx != -1 && ty == -1))  // collision with the left or the right wall
     {
         result.t = tx;
         result.v_wall = true;
         result.h_wall = false;
     }
-    else if((ty < tx && ty != -1) || (ty != -1 && tx == -1)) // collides with the top or the bottom wall
+    else if((ty < tx && ty != -1) || (ty != -1 && tx == -1)) // collision with the top or the bottom wall
     {
         result.t = ty;
         result.v_wall = false;
         result.h_wall = true;
     }
-    else
+    else // no collision with wall - the particle is not moving
     {
         result.t = ty;
         result.v_wall = false;
@@ -140,8 +137,7 @@ void Collisions::handle_wall_collision(Particle & p, bool h_wall, bool v_wall)
     }
 }
 
-// finds two particles of p with the nearest collision
-// returns their indexes and collision time
+// finds the nearest collision
 Collisions::c_time Collisions::next_collision(Particle* p, int n, int area_width, int area_height)
 {
     Collisions::c_time result;
@@ -190,12 +186,3 @@ Collisions::c_time Collisions::next_collision(Particle* p, int n, int area_width
     }
     return result;
 }
-
-// int main()
-// {
-//     using namespace std;
-//     Particle p1(10, 1, 10, 10, 0, 1);
-//     Particle p2(10, 1, 10, 30, 2, 1);
-//     std::cout << Collisions::collision_time(p1, p2) << std::endl;
-//     return 0;
-// }

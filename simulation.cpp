@@ -66,9 +66,3 @@ void particle_vector(double& vx, double& vy, int min_velocity, int max_velocity)
     vx = randrange(0, velocity + 1);
     vy = sqrt(pow(velocity, 2) - pow(vx, 2));
 }
-
-
-// int main()
-// {
-//     return 0;
-// }

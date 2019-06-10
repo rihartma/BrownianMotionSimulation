@@ -8,19 +8,25 @@
 
 const double PI =  3.14159265359;
 
-// functions that detects the collision and that do collision responses
+// namespace for functions and data types for:
+// - the detection of the collisions
+// - the collision responses
 namespace Collisions
 {
-    struct c_time  // saves to indexes of the particles and time t in which the particles gonna collide
+    // saves the type of the collision, time of the collision and indexes of the colliding particles
+    struct c_time
     {
-        // bool flag
-        // true - particle p1 collides with the wall
-        // false - no collision with walls, collision between p1 and p2 particles
-        bool v_wall; // for the left or the right wall(vertical)
-        bool h_wall; // for the top or the bottom wall(horizontal)
+        // bool flags v_wall
+        // true - particle p1 collides with the vertical(left or right) wall
+        // false - no collision with vertical wall
+        bool v_wall;
+        // bool flags v_wall
+        // true - particle p1 collides with the horizontal(top of bottom) wall
+        // false - no collision with horizontal wall
+        bool h_wall;
         // indexes of the particles
         int p1;
-        int p2;
+        int p2;  // only if both values(h_wall, v_wall) are false - collision of 2 particles
         // a collision time
         double t;
     };
@@ -32,8 +38,7 @@ namespace Collisions
     void handle_collision(Particle & p1, Particle & p2);
     // recalculates the vectors of the particles after a collision with wall appear
     void handle_wall_collision(Particle & p, bool h_wall, bool v_wall);
-    // finds two particles of p with the nearest collision
-    // returns their indexes and collision time
+    // finds the nearest collision
     c_time next_collision(Particle* p, int n, int area_width, int area_height);
 }
 
