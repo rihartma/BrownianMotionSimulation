@@ -11,7 +11,7 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 // delay between rendering new frames
-const int DELAY = 50;
+const int DELAY = 30;
 
 SDL_Window* bm_window = NULL;  // the window for rendering
 SDL_Renderer* bm_renderer = NULL;  // the window renderer

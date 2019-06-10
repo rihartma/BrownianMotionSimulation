@@ -6,8 +6,6 @@
 #include <cfloat>
 #include "particle.h"
 
-const double PI =  3.14159265359;
-
 // namespace for functions and data types for:
 // - the detection of the collisions
 // - the collision responses

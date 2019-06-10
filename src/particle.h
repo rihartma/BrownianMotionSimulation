@@ -3,6 +3,8 @@
 
 #include <cmath>  // for the unit vector calculation
 
+const double PI =  3.14159265359;
+
 // declaration of a class representing every particle
 // e.g. pollen grain, dust particle, H2O molecule or O2 molecule etc.
 class Particle
