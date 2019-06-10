@@ -159,9 +159,7 @@ Collisions::c_time Collisions::next_collision(Particle* p, int n, int area_width
         next_collision = Collisions::wall_collision_time(p[i], area_width, area_height);
         if(next_collision.t >= 0 && next_collision.t < result.t)
         {
-            result.t = next_collision.t;
-            result.h_wall = next_collision.h_wall;
-            result.v_wall = next_collision.v_wall;
+            result = next_collision;
             result.p1 = i;
         }
     }

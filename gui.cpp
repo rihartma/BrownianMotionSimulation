@@ -136,7 +136,7 @@ void run()
     double part_step = step;
 
     // Stores the information of the nearest collision
-    Collisions::next_col;
+    Collisions::c_time next_col;
     next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
 
     // a main loop
