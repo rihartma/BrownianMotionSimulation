@@ -1,0 +1,3 @@
+#!/bin/bash
+
+g++ gui.cpp simulation.cpp collision.cpp particle.cpp -w -lSDL2 -o gui
