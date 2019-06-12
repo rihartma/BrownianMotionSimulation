@@ -138,11 +138,13 @@ void Collisions::handle_collision2(Particle & p1, Particle & p2)
     double m2 = p2.mass();
 
     double p_dist = pow(x1-x2, 2) + pow(y1-y2, 2);  // distance between centers squared
+    double par1 = ((vx1-vx2)*(x1-x2)+(vy1-vy2)*(y1-y2))/p_dist;
+    double par2 = ((vx2-vx1)*(x2-x1)+(vy2-vy1)*(y2-y1))/p_dist;
     // settigng the new vectors
-    p1.setVx(vx1 - 2*m2/(m1+m2) * ((vx1-vx2)*(x1-x2)+(vy1-vy2)*(y1-y2))/p_dist * (x1-x2));
-    p1.setVy(vy1 - 2*m2/(m1+m2) * ((vx1-vx2)*(x1-x2)+(vy1-vy2)*(y1-y2))/p_dist * (y1-y2));
-    p2.setVx(vx2 - 2*m1/(m1+m2) * ((vx2-vx1)*(x2-x1)+(vy2-vy1)*(y2-y1))/p_dist * (x2-x1));
-    p2.setVy(vy2 - 2*m1/(m1+m2) * ((vx2-vx1)*(x2-x1)+(vy2-vy1)*(y2-y1))/p_dist * (y2-y1));
+    p1.setVx(vx1 - 2*m2/(m1+m2) * par1 * (x1-x2));
+    p1.setVy(vy1 - 2*m2/(m1+m2) * par1 * (y1-y2));
+    p2.setVx(vx2 - 2*m1/(m1+m2) * par2 * (x2-x1));
+    p2.setVy(vy2 - 2*m1/(m1+m2) * par2 * (y2-y1));
 }
 
 // recalculates the vectors of the particles after a collision with wall appear

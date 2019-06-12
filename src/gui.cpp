@@ -11,7 +11,7 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 // delay between rendering new frames
-const int DELAY = 30;
+const int DELAY = 25;
 
 SDL_Window* bm_window = NULL;  // the window for rendering
 SDL_Renderer* bm_renderer = NULL;  // the window renderer
@@ -142,6 +142,8 @@ void run()
     // a main loop
     while(!quit)
     {
+        // std::cout << "Energy: " << Simulation::kinetic_energy(particles) << ", momentum: " << Simulation::momentum(particles) << std::endl;
+        
         // drawing of the simulation between the collisions
         while(next_col.t - part_step >= 0)
         {
@@ -164,7 +166,7 @@ void run()
             if(next_col.h_wall || next_col.v_wall)
                 Collisions::handle_wall_collision(particles[next_col.p1], next_col.h_wall, next_col.v_wall);
             else
-                Collisions::handle_collision(particles[next_col.p1], particles[next_col.p2]);
+                Collisions::handle_collision2(particles[next_col.p1], particles[next_col.p2]);
             next_col = Collisions::next_collision(particles, Simulation::NUMBER_OF_MEDIUM + Simulation::NUMBER_OF_PARTICLES, Simulation::SURFACE_WIDTH, Simulation::SURFACE_HEIGHT);
         }
         while(part_step - next_col.t >= 0);
