@@ -12,9 +12,9 @@ namespace Simulation
     const double RADIUS_OF_PARTICLES = 50;  // the radius of the particles that floats in the medium(e.g. pollen grain)
     const double MASS_OF_MEDIUM = PI * pow(RADIUS_OF_MEDIUM, 2);  // the mass of the particle that forms the medium(e.g. a H2O molecule)
     const double MASS_OF_PARTICLES = PI * pow(RADIUS_OF_PARTICLES, 2);  // the mass of the particle that floats in the medium(e.g. pollen grain)
-    const int NUMBER_OF_MEDIUM = 150;  // the amount of particles that forms the medium(e.g. a H2O molecule)
+    const int NUMBER_OF_MEDIUM = 50;  // the amount of particles that forms the medium(e.g. a H2O molecule)
     const int NUMBER_OF_PARTICLES = 1;  // the number of the particles that floats in the medium(e.g. pollen grain)
-    const double MAX_SPEED = 5;  // a maximal possible speed of the particle after the start of the simulation
+    const double MAX_SPEED = 4;  // a maximal possible speed of the particle after the start of the simulation
     const double MIN_SPEED = 1;  // a minimal possible speed of the particle after the start of the simulation
     const int SURFACE_WIDTH = 640;  // width of the surface for the simulation
     const int SURFACE_HEIGHT = 480;  // height of the surface for the simulation

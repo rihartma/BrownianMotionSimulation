@@ -63,6 +63,8 @@ int randrange(int min, int max)
 void particle_vector(double& vx, double& vy, int min_velocity, int max_velocity)
 {
     int velocity = randrange(min_velocity, max_velocity + 1);
-    vx = randrange(0, velocity + 1);
-    vy = sqrt(pow(velocity, 2) - pow(vx, 2));
+    int angle = randrange(0, 361);
+    double rad = angle*PI/180;
+    vx = velocity/cos(rad);
+    vy = velocity/sin(rad);
 }
