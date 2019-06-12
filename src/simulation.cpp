@@ -8,11 +8,40 @@ Particle* Simulation::init(int m, int n)  // an initialization of the simulation
     Particle* p = new Particle[m + n];
 
     srand(time(NULL));  // initialization of the random generater
+
+    int limit = Simulation::SURFACE_WIDTH * Simulation::SURFACE_HEIGHT;  // maximum possible number of particles in the system
+    int counter = 0;
+    // initialization of the Particles that floats in the medium
+    int i = 0;
+    while(i < n && counter < limit)
+    {
+        counter++;
+        p[i] = Particle(
+            RADIUS_OF_PARTICLES,
+            MASS_OF_PARTICLES,
+            randrange(RADIUS_OF_PARTICLES, SURFACE_WIDTH - RADIUS_OF_PARTICLES),
+            randrange(RADIUS_OF_PARTICLES, SURFACE_HEIGHT - RADIUS_OF_PARTICLES),
+            0,
+            0
+            );
+        for(int j = 0; j < i; j++)
+        {
+            if(overlap(p[i], p[j]))
+            {
+                i--;
+                break;
+            }
+        }
+        i++;
+    }
+
     // initialization of the Particles that forms the medium
     double vx;
     double vy;
-    for(int i = 0; i < m; i++)
+    i = n;
+    while(i < m + n && counter < limit)
     {
+        counter++;
         particle_vector(vx, vy);
         p[i] = Particle(
             RADIUS_OF_MEDIUM,
@@ -22,18 +51,22 @@ Particle* Simulation::init(int m, int n)  // an initialization of the simulation
             vx,
             vy
             );
+        for(int j = 0; j < i; j++)
+        {
+            if(overlap(p[i], p[j]))
+            {
+                i--;
+                break;
+            }
+        }
+        i++;
     }
-    // initialization of the Particles that floats in the medium
-    for(int i = m; i < m + n; i++)
+
+    // Error message
+    if(counter >= limit)
     {
-        p[i] = Particle(
-            RADIUS_OF_PARTICLES,
-            MASS_OF_PARTICLES,
-            randrange(RADIUS_OF_PARTICLES, SURFACE_WIDTH - RADIUS_OF_PARTICLES),
-            randrange(RADIUS_OF_PARTICLES, SURFACE_HEIGHT - RADIUS_OF_PARTICLES),
-            0,
-            0
-            );
+        std::cerr << "To many particles were inserted into the system!" << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     return p;
@@ -79,6 +112,7 @@ int randrange(int min, int max)
     int n = rand() % (max-min);
     return n + min;
 }
+
 // a function that generates random vector for velocity and direction representation of the particle
 void particle_vector(double& vx, double& vy, int min_velocity, int max_velocity)
 {
@@ -87,4 +121,19 @@ void particle_vector(double& vx, double& vy, int min_velocity, int max_velocity)
     double rad = angle*PI/180;
     vx = velocity*cos(rad);
     vy = velocity*sin(rad);
+}
+
+// a function that returns the distance between two particles
+double distance(const Particle& p1, const Particle& p2)
+{
+    double dist = sqrt( pow(p1.getX()-p2.getX(), 2) + pow(p1.getY()-p2.getY(), 2) );
+    return dist;
+}
+
+// a function that checks whether 2 circles overlap each other
+bool overlap(const Particle& p1, const Particle& p2)
+{
+    if(distance(p1, p2) < p1.radius() + p2.radius())
+        return true;
+    return false;
 }
