@@ -34,6 +34,7 @@ namespace Collisions
     c_time wall_collision_time(const Particle & p1, int area_width, int area_height);
     // recalculates the vectors of the particles after a collision appears
     void handle_collision(Particle & p1, Particle & p2);
+    void handle_collision2(Particle & p1, Particle & p2);
     // recalculates the vectors of the particles after a collision with wall appear
     void handle_wall_collision(Particle & p, bool h_wall, bool v_wall);
     // finds the nearest collision
