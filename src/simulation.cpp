@@ -53,6 +53,26 @@ void Simulation::step(Particle* particles, int n, double t)  // the calculation 
     }
 }
 
+double Simulation::kinetic_energy(Particle* particles, int n)  // calculates the kinetic energy of the system
+{
+    double energy = 0;
+    for(int i = 0; i < n; i++)
+    {
+        energy += 0.5 * particles[i].mass() * pow(particles[i].getV(), 2);
+    }
+    return energy;
+}
+
+double Simulation::momentum(Particle* particles, int n)  // calculates the momentum of the system
+{
+    double m = 0;
+    for(int i = 0; i < n; i++)
+    {
+        m += particles[i].mass() * particles[i].getV();
+    }
+    return m;
+}
+
 // a function that generates random number in a interval <min, max)
 int randrange(int min, int max)
 {
@@ -65,6 +85,6 @@ void particle_vector(double& vx, double& vy, int min_velocity, int max_velocity)
     int velocity = randrange(min_velocity, max_velocity + 1);
     int angle = randrange(0, 361);
     double rad = angle*PI/180;
-    vx = velocity/cos(rad);
-    vy = velocity/sin(rad);
+    vx = velocity*cos(rad);
+    vy = velocity*sin(rad);
 }
