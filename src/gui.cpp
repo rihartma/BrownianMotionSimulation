@@ -153,7 +153,7 @@ void run()
             draw_scene(bm_renderer, particles);
             measure_t_2 = std::chrono::high_resolution_clock::now();
             duration = std::chrono::duration_cast<std::chrono::microseconds>(measure_t_2 - measure_t_1).count();
-            SDL_Delay(DELAY-duration/1000);
+            SDL_Delay((DELAY-duration/1000));
             part_step = step;
         }
         // calculates the next collision and does the collision responses
@@ -172,7 +172,7 @@ void run()
         while(part_step - next_col.t >= 0);
         measure_t_2 = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::microseconds>(measure_t_2 - measure_t_1).count();
-        SDL_Delay(DELAY-duration/1000);
+        SDL_Delay(abs(DELAY-duration/1000));
 
         // Checking if a quitbutton was or wasn't pressed
         while(SDL_PollEvent(&event) != 0)
