@@ -12,4 +12,4 @@ This project simulates a movement of many particles(e. g. H20 molecules) that co
 # Architecture
 Every particle has got its own position, radius, mass and vector representing its velocity and direction.
 
-It finds the two particles that are colliding first and the time when the collision occurs. Then the collision time is splitted into the same parts that are displayed. After the collision time the program calculates the new vector of the particles that collided. This process is repeated.
+It finds the two particles that are colliding first and the time when the collision occurs. Then the collision time is splitted into the same parts that are displayed. If the collision time had elapsed than the program calculates the new vector of the particles that collided. This process is repeated.
